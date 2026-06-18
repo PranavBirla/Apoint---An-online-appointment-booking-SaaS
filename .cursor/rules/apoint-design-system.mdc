@@ -1,0 +1,53 @@
+---
+description: Apoint design system — premium monochrome UI for all frontend work
+globs: frontend/**/*
+alwaysApply: false
+---
+
+# Apoint Design System
+
+Appointment booking SaaS. Feel: Uber, Airbnb, Apple, Linear, Notion — human-designed, minimal, production-ready. Never generic AI SaaS aesthetics.
+
+## Avoid
+
+Emojis in UI, neon/glow, glassmorphism, heavy gradients, excessive shadows, fancy animations, generic dashboard templates, 3-column feature cards, bright blue accents, visual clutter, too many borders/icons/badges.
+
+## Colors
+
+- Primary: `#000000` (black), `#FFFFFF` (white)
+- Green: success only
+- Red: errors, cancellation, destructive actions
+- Mostly monochrome — no other accent colors unless requested
+
+## Layout & Typography
+
+- Large breathing space, generous padding/margins, calm uncluttered pages
+- Typography is the hero: large headings, clear hierarchy, minimal copy
+- Mobile-first, strong visual hierarchy, clean alignment
+
+## Components (Tailwind)
+
+**Buttons:** large, rounded, black bg + white text
+```jsx
+<button className="rounded-full bg-black px-6 py-3 text-white">Book</button>
+```
+
+**Cards:** minimal, soft radius, little/no shadow
+```jsx
+<div className="rounded-xl border border-neutral-200 p-6">...</div>
+```
+
+**Inputs:** large, touch-friendly, clean borders
+```jsx
+<input className="w-full rounded-lg border border-neutral-300 px-4 py-3" />
+```
+
+## Stack & Structure
+
+React + Tailwind CSS. Mobile responsive. Reusable components, clean folder organization. Usability first — real product screens, not design showcases. No placeholder-heavy UIs.
+
+## Product Context
+
+Users: browse professionals, view profiles, check availability, book/manage appointments.
+Professionals: manage availability, view bookings, update status.
+Tone: trustworthy, premium, simple.

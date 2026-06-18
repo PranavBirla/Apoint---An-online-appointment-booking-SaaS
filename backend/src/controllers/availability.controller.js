@@ -146,9 +146,6 @@ async function getAvailableSlots(req, res) {
             }
         })
 
-        console.log("DATE RECEIVED:", date);
-        console.log("APPOINTMENTS:", appointments);
-
         const slotsWithStatus = slots.map(slot => {
 
             const booked = appointments.some(
