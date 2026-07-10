@@ -177,9 +177,7 @@ export default function Register() {
                         onClick={() => navigate("/")}
                         className="relative z-10 flex items-center gap-3 w-fit"
                     >
-                        <div className="w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center text-lg font-bold">
-                            A
-                        </div>
+                        <img className="h-20" src="/APOINT_LOGO.png" alt="A" />
 
                         <span className="text-2xl font-bold tracking-tight">
                             Apoint
@@ -268,9 +266,7 @@ export default function Register() {
                             onClick={() => navigate("/")}
                             className="flex items-center gap-2.5"
                         >
-                            <div className="w-9 h-9 rounded-xl bg-black text-white flex items-center justify-center font-bold">
-                                A
-                            </div>
+                            <img className="h-16" src="/APOINT_LOGO.png" alt="A" />
 
                             <span className="text-xl font-bold tracking-tight">
                                 Apoint

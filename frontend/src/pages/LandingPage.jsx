@@ -24,9 +24,7 @@ export default function LandingPage() {
                 <div className="max-w-7xl mx-auto h-16 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
 
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-xl bg-black text-white flex items-center justify-center font-bold">
-                            A
-                        </div>
+                        <img className="h-20" src="/APOINT_LOGO.png" alt="A" />
 
                         <span className="text-xl font-bold tracking-tight">
                             Apoint

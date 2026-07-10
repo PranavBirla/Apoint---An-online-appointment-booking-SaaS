@@ -2,97 +2,117 @@ import Sidebar from "../components/layout/Sidebar";
 
 import BrowseHero from "../components/browse/BrowseHero";
 import SearchBar from "../components/browse/SearchBar";
-import StatsSection from "../components/browse/StatsSection";
 import CategoryChips from "../components/browse/CategoryChips";
 import ProfessionalsGrid from "../components/browse/ProfessionalsGrid";
 import HelpBanner from "../components/browse/HelpBanner";
 
 import { useEffect, useState } from "react";
 
-import { getProfessionals, } from "../services/professionalService";
+import { getProfessionals } from "../services/professionalService";
+
 
 export default function BrowseProfessionals() {
-  const [professionals, setProfessionals] =
-    useState([]);
 
-  const [profession, setProfession] =
-    useState("");
+    const [professionals, setProfessionals] = useState([]);
 
-  const [loading, setLoading] =
-    useState(true);
+    const [profession, setProfession] = useState("");
 
-  const [search, setSearch] =
-    useState("");
+    const [loading, setLoading] = useState(true);
 
-  const [debouncedSearch, setDebouncedSearch] =
-    useState("");
+    const [search, setSearch] = useState("");
 
-  // SEARCH DEBOUNCE
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 500);
-
-    return () => {
-      clearTimeout(timer);
-    };
-
-  }, [search]);
+    const [debouncedSearch, setDebouncedSearch] = useState("");
 
 
-  // FETCH PROFESSIONALS
-  useEffect(() => {
-    async function fetchProfessionals() {
+    useEffect(() => {
 
-      try {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(search);
+        }, 500);
 
-        setLoading(true);
-        const data =
-          await getProfessionals({
-            search: debouncedSearch,
-            profession: profession
-          });
 
-        setProfessionals(data);
+        return () => {
+            clearTimeout(timer);
+        };
 
-      } catch (error) {
-        console.log(error);
+    }, [search]);
 
-      } finally {
-        setLoading(false);
-      }
 
-    }
-    fetchProfessionals();
+    useEffect(() => {
 
-  }, [debouncedSearch, profession]);
+        async function fetchProfessionals() {
 
-  return (
-    <div className="flex bg-white min-h-screen">
-      <Sidebar />
+            try {
 
-      <main className="flex-1 p-6 lg:p-10 ">
-        <div className="max-w-7xl mx-auto">
-          <BrowseHero />
+                setLoading(true);
 
-          <SearchBar
-            search={search}
-            setSearch={setSearch} />
+                const data = await getProfessionals({
+                    search: debouncedSearch,
+                    profession,
+                });
 
-          <StatsSection />
+                setProfessionals(data);
 
-          <CategoryChips
-            profession={profession}
-            setProfession={setProfession} />
+            } catch (error) {
 
-          <ProfessionalsGrid
-            professionals={professionals}
-          />
+                console.log(error);
 
-          <HelpBanner />
+            } finally {
+
+                setLoading(false);
+
+            }
+
+        }
+
+
+        fetchProfessionals();
+
+    }, [debouncedSearch, profession]);
+
+
+    return (
+        <div className="flex min-h-screen bg-[#FAFAF7]">
+
+            <Sidebar />
+
+
+            <main className="flex-1 min-w-0 px-4 pt-5 pb-28 sm:px-6 lg:px-8 lg:py-8">
+
+                <div className="w-full max-w-[1500px] mx-auto">
+
+                    <BrowseHero>
+
+                        <SearchBar
+                            search={search}
+                            setSearch={setSearch}
+                        />
+
+                    </BrowseHero>
+
+
+                    <div className="mt-6 lg:mt-8">
+
+                        <CategoryChips
+                            profession={profession}
+                            setProfession={setProfession}
+                        />
+
+                    </div>
+
+
+                    <ProfessionalsGrid
+                        professionals={professionals}
+                        loading={loading}
+                    />
+
+
+                    <HelpBanner />
+
+                </div>
+
+            </main>
+
         </div>
-      </main>
-    </div>
-  );
-
+    );
 }
