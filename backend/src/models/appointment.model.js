@@ -44,6 +44,9 @@ const appointmentSchema = new mongoose.Schema({
         trim: true,
         maxlength: 500
     },
+    cancelledAt: {
+        type: Date
+    }
 });
 
 appointmentSchema.index(
@@ -56,6 +59,17 @@ appointmentSchema.index(
         unique: true
     }
 );
+
+appointmentSchema.index({
+    clientId: 1,
+    status: 1
+});
+
+appointmentSchema.index({
+    clientId: 1,
+    professionalId: 1,
+    status: 1
+});
 
 const appointmentModel = mongoose.model("appointment", appointmentSchema);
 

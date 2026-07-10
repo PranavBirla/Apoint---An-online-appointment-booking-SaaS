@@ -11,6 +11,17 @@ export async function registerUser(
     return data;
 }
 
+export async function updateUserProfile(
+    payload
+) {
+    const { data } = await api.patch(
+        "/auth/user/me",
+        payload
+    );
+
+    return data;
+}
+
 export async function loginUser(
     payload
 ) {

@@ -9,6 +9,13 @@ const professionalProfileSchema = new mongoose.Schema({
     },
     profession: {
         type: String,
+        enum: [
+            "Doctor",
+            "Dentist",
+            "Lawyer",
+            "Consultant",
+            "Therapist"
+        ],
         required: true,
         maxlength: 50
     },
@@ -19,7 +26,7 @@ const professionalProfileSchema = new mongoose.Schema({
     bio: {
         type: String,
         required: true,
-        maxlength: 1000
+        maxlength: 500
     },
     experienceYears: {
         type: Number,
@@ -27,12 +34,13 @@ const professionalProfileSchema = new mongoose.Schema({
         min: 0,
         max: 70
     },
-    consultationFee:{
+    consultationFee: {
         type: Number,
         required: true,
-        min: 0
+        min: 100,
+        max: 10000
     },
-    profileImage:{ 
+    profileImage: {
         type: String,
         default: ""
     },

@@ -17,10 +17,24 @@ import {
 import { Link, useLocation } from "react-router-dom";
 
 export default function Sidebar() {
-    const [collapsed, setCollapsed] = useState(false);
+    const [collapsed, setCollapsed] = useState(() => {
+        return localStorage.getItem("sidebarCollapsed") === "true";
+    });
     const [mobileOpen, setMobileOpen] = useState(false);
 
     const location = useLocation();
+
+
+    function toggleSidebar() {
+        const next = !collapsed;
+
+        setCollapsed(next);
+
+        localStorage.setItem(
+            "sidebarCollapsed",
+            String(next)
+        );
+    }
 
     const navItems = [
         {
@@ -32,11 +46,6 @@ export default function Sidebar() {
             name: "Appointments",
             icon: Calendar,
             path: "/appointments",
-        },
-        {
-            name: "My Bookings",
-            icon: ClipboardList,
-            path: "/bookings",
         },
         {
             name: "Messages",
@@ -62,48 +71,27 @@ export default function Sidebar() {
 
     return (
         <>
-            {/* MOBILE HEADER */}
-
-            <div className="lg:hidden h-16 border-b border-gray-200 bg-white flex items-center justify-between px-5 sticky top-0 z-50">
-                <h1 className="text-2xl font-bold">
-                    Apoint
-                </h1>
-
-                <button
-                    onClick={() => setMobileOpen(true)}
-                    className="p-2"
-                >
-                    <Menu size={24} />
-                </button>
-            </div>
-
-            {/* MOBILE OVERLAY */}
-
-            {mobileOpen && (
-                <div
-                    onClick={() => setMobileOpen(false)}
-                    className="fixed inset-0 bg-black/20 z-40 lg:hidden"
-                />
-            )}
-
             {/* SIDEBAR */}
 
             <aside
                 className={`
-          fixed lg:sticky top-0 left-0 z-50
-          h-screen bg-white border-r border-gray-200
-          transition-all duration-300 ease-in-out
-
-          ${collapsed
+                    hidden lg:flex
+                    sticky
+                    top-0
+                    h-screen
+                    shrink-0
+                    bg-white
+                    border-r
+                    border-gray-200
+                    transition-all
+                    duration-300
+                    ease-in-out
+                
+                    ${collapsed
                         ? "w-[90px]"
                         : "w-[260px]"
                     }
-
-          ${mobileOpen
-                        ? "translate-x-0"
-                        : "-translate-x-full lg:translate-x-0"
-                    }
-        `}
+                `}
             >
                 {/* TOP */}
 
@@ -120,20 +108,8 @@ export default function Sidebar() {
                         {/* DESKTOP COLLAPSE */}
 
                         <button
-                            onClick={() =>
-                                setCollapsed(!collapsed)
-                            }
-                            className="
-                hidden lg:flex
-                w-10 h-10
-                items-center
-                justify-center
-                rounded-xl
-                border
-                border-gray-200
-                hover:bg-gray-50
-                transition
-              "
+                            onClick={toggleSidebar}
+                            className=" hidden lg:flex w-10 h-10 items-center justify-center rounded-xl border border-gray-200 hover:bg-gray-50 transition "
                         >
                             {collapsed ? (
                                 <ChevronRight size={18} />
@@ -167,19 +143,13 @@ export default function Sidebar() {
                                 <Link
                                     key={item.path}
                                     to={item.path}
-                                    className={`
-                    flex items-center
-                    gap-4
-                    h-14
-                    rounded-2xl
-                    px-4
-                    transition-all
+                                    className={` flex items-center gap-4 h-14 rounded-2xl px-4 transition-all
 
-                    ${active
+                                    ${active
                                             ? "bg-gray-100 text-black"
                                             : "hover:bg-gray-50 text-gray-600"
                                         }
-                  `}
+                                    `}
                                 >
                                     <Icon size={22} />
 
@@ -198,22 +168,10 @@ export default function Sidebar() {
                     {!collapsed && (
                         <div className="mt-auto p-4">
                             <div
-                                className="
-                  border
-                  border-gray-200
-                  rounded-3xl
-                  p-5
-                  bg-white
-                "
+                                className=" border border-gray-200 rounded-3xl p-5 bg-white "
                             >
                                 <div
-                                    className="
-                    w-12 h-12
-                    rounded-xl
-                    bg-gray-100
-                    flex items-center
-                    justify-center
-                  "
+                                    className=" w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center "
                                 >
                                     <BriefcaseBusiness
                                         size={22}
@@ -230,17 +188,7 @@ export default function Sidebar() {
                                 </p>
 
                                 <button
-                                    className="
-                    mt-5
-                    w-full
-                    h-11
-                    rounded-xl
-                    bg-black
-                    text-white
-                    font-medium
-                    hover:opacity-90
-                    transition
-                  "
+                                    className=" mt-5 w-full h-11 rounded-xl bg-black text-white font-medium hover:opacity-90 transition "
                                 >
                                     Get Started
                                 </button>
@@ -249,6 +197,72 @@ export default function Sidebar() {
                     )}
                 </div>
             </aside>
+
+
+            {/* MOBILE BOTTOM NAV */}
+
+            <div
+                className=" lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 h-16 "
+            >
+                <div className="grid grid-cols-4 h-full">
+                    {[
+                        {
+                            name: "Browse",
+                            icon: Home,
+                            path: "/professionals",
+                        },
+                        {
+                            name: "Appointments",
+                            icon: Calendar,
+                            path: "/appointments",
+                        },
+                        {
+                            name: "Messages",
+                            icon: MessageCircle,
+                            path: "/messages",
+                        },
+                        {
+                            name: "Profile",
+                            icon: User,
+                            path: "/profile",
+                        },
+                    ].map((item) => {
+                        const Icon = item.icon;
+
+                        const active =
+                            location.pathname === item.path;
+
+                        return (
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                className=" flex flex-col items-center justify-center gap-1 "
+                            >
+                                <Icon
+                                    size={20}
+                                    className={
+                                        active
+                                            ? "text-black"
+                                            : "text-gray-400"
+                                    }
+                                />
+
+                                <span
+                                    className={` text-[11px]
+
+                                    ${active
+                                            ? "text-black font-medium"
+                                            : "text-gray-400"
+                                        }
+                                    `}
+                                >
+                                    {item.name}
+                                </span>
+                            </Link>
+                        );
+                    })}
+                </div>
+            </div>
         </>
     );
 }

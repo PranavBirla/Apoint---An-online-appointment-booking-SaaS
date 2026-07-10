@@ -3,103 +3,165 @@ const professionalProfileModel = require("../models/professionalProfile.model");
 const availabilityModel = require("../models/availability.model");
 
 async function createAppointment(req, res) {
-    const { professionalId, appointmentDate, startTime, endTime } = req.body;
 
-    const clientId = req.user._id
+    try {
 
-    const professional = await professionalProfileModel.findById(professionalId);
-    console.log(professionalId);
+        const { professionalId, appointmentDate, startTime, endTime } = req.body;
+
+        const clientId = req.user._id
 
 
-    if (!professional) {
-        return res.status(404).json({
-            message: "Professional not found"
-        });
-    }
 
-    const dayOfWeek = new Date(appointmentDate).toLocaleDateString("en-US", { weekday: "long" });
+        function parseLocalDate(dateString) {
 
-    const availability = await availabilityModel.findOne({ professionalId, dayOfWeek });
+            const [year, month, day] =
+                dateString
+                    .split("-")
+                    .map(Number);
 
-    if (!availability) {
-        return res.status(400).json({
-            message:
-                "Professional is not available on this day"
-        });
-    }
+            return new Date(
+                year,
+                month - 1,
+                day
+            );
+        }
 
-    function convertToMinutes(time) {
-        const [hours, minutes] = time.split(":");
-        const totalMinutes = Number(hours) * 60 + Number(minutes);
-        return (totalMinutes)
-    }
+        const normalizedDate =
+            parseLocalDate(
+                appointmentDate
+            );
 
-    const availabilityStart =
-        convertToMinutes(
-            availability.startTime
-        );
+        const activeAppointmentCount =
+            await appointmentModel.countDocuments({
+                clientId,
+                status: {
+                    $in: [
+                        "pending",
+                        "confirmed"
+                    ]
+                }
+            });
 
-    const availabilityEnd =
-        convertToMinutes(
-            availability.endTime
-        );
+        if (activeAppointmentCount >= 3) {
+            return res.status(400).json({
+                message:
+                    "You already have 3 active appointments. Complete or cancel an existing appointment before booking another."
+            });
+        }
 
-    const appointmentStart =
-        convertToMinutes(
-            startTime
-        );
+        const existingActiveAppointment =
+            await appointmentModel.findOne({
+                clientId,
+                professionalId,
+                status: {
+                    $in: [
+                        "pending",
+                        "confirmed"
+                    ]
+                }
+            });
 
-    const appointmentEnd =
-        convertToMinutes(
+        if (existingActiveAppointment) {
+            return res.status(409).json({
+                message:
+                    "You already have an active appointment with this professional."
+            });
+        }
+
+
+        const professional = await professionalProfileModel.findById(professionalId);
+
+        if (!professional) {
+            return res.status(404).json({
+                message: "Professional not found"
+            });
+        }
+
+        const dayOfWeek =
+            normalizedDate
+                .toLocaleDateString(
+                    "en-US",
+                    {
+                        weekday: "long"
+                    }
+                );
+
+        const availability = await availabilityModel.findOne({ professionalId, dayOfWeek });
+
+        if (!availability) {
+            return res.status(400).json({
+                message:
+                    "Professional is not available on this day"
+            });
+        }
+
+        function convertToMinutes(time) {
+            const [hours, minutes] = time.split(":");
+            const totalMinutes = Number(hours) * 60 + Number(minutes);
+            return (totalMinutes)
+        }
+
+        const availabilityStart =
+            convertToMinutes(
+                availability.startTime
+            );
+
+        const availabilityEnd =
+            convertToMinutes(
+                availability.endTime
+            );
+
+        const appointmentStart =
+            convertToMinutes(
+                startTime
+            );
+
+        const appointmentEnd =
+            convertToMinutes(
+                endTime
+            );
+
+        if (appointmentStart < availabilityStart || appointmentEnd > availabilityEnd) {
+            return res.status(400).json({
+                message: "Slot is outside availability"
+            });
+        }
+
+        const difference = appointmentStart - availabilityStart;
+
+        if (difference % availability.slotDuration !== 0) {
+            return res.status(400).json({
+                message: "Invalid slot boundary!"
+            })
+        }
+
+        const appointmentDuration = appointmentEnd - appointmentStart;
+
+        if (appointmentDuration !== availability.slotDuration) {
+            return res.status(400).json({
+                message: "Invalid appointment duration"
+            });
+        }
+
+        
+
+        const appointment = await appointmentModel.create({
+            clientId,
+            professionalId,
+            appointmentDate: normalizedDate,
+            startTime,
             endTime
-        );
+        })
 
-    if (appointmentStart < availabilityStart || appointmentEnd > availabilityEnd) {
-        return res.status(400).json({
-            message: "Slot is outside availability"
+        res.status(201).json({
+            message: "Appointment booked successfully!",
+            appointment
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: "Something went wrong"
         });
     }
-
-    const difference = appointmentStart - availabilityStart;
-
-    if (difference % availability.slotDuration !== 0) {
-        return res.status(400).json({
-            message: "Invalid slot boundary!"
-        })
-    }
-
-    const appointmentDuration = appointmentEnd - appointmentStart;
-
-    if (appointmentDuration !== availability.slotDuration) {
-        return res.status(400).json({
-            message: "Invalid appointment duration"
-        });
-    }
-
-    const existingAppointment = await appointmentModel.findOne({
-        professionalId,
-        appointmentDate,
-        startTime
-    });
-
-    if (existingAppointment) {
-        return res.status(409).json({
-            message: "Appointment already exists!"
-        })
-    }
-
-    const appointment = await appointmentModel.create({
-        clientId,
-        professionalId,
-        appointmentDate,
-        startTime,
-        endTime
-    })
-
-    res.status(201).json({
-        message: "Appointment booked successfully!",
-        appointment
-    })
 }
 
 
@@ -113,7 +175,7 @@ async function getMyAppointments(req, res) {
             "completed",
             "cancelled"
         ];
-        
+
         if (
             status &&
             !validStatuses.includes(status)
@@ -170,8 +232,6 @@ async function getMyAppointments(req, res) {
             appointments: formattedAppointments
         })
     } catch (error) {
-        console.log(error);
-
         res.status(500).json({
             message: "Something went wrong"
         });
@@ -327,7 +387,7 @@ async function updateAppointmentStatus(req, res) {
         ) {
             return res.status(400).json({
                 message:
-                `Cannot change status from ${appointment.status} to ${status}`
+                    `Cannot change status from ${appointment.status} to ${status}`
             });
         }
 
@@ -351,6 +411,7 @@ async function cancelAppointment(req, res) {
     try {
 
         const { id } = req.params;
+        const { cancellationReason } = req.body;
 
         const appointment =
             await appointmentModel.findById(id);
@@ -362,6 +423,103 @@ async function cancelAppointment(req, res) {
         }
 
         if (
+            appointment.status ===
+            "cancelled"
+        ) {
+            return res.status(400).json({
+                message:
+                    "Appointment is already cancelled."
+            });
+        }
+
+        if (
+            appointment.status ===
+            "completed"
+        ) {
+            return res.status(400).json({
+                message:
+                    "Completed appointments cannot be cancelled."
+            });
+        }
+
+        function getAppointmentDateTime(
+            appointmentDate,
+            startTime
+        ) {
+
+            const [hours, minutes] =
+                startTime.split(":");
+
+            const appointmentDateTime =
+                new Date(appointmentDate);
+
+            appointmentDateTime.setHours(
+                Number(hours),
+                Number(minutes),
+                0,
+                0
+            );
+
+            return appointmentDateTime;
+        }
+
+        const appointmentDateTime =
+            getAppointmentDateTime(
+                appointment.appointmentDate,
+                appointment.startTime
+            );
+
+        const now = new Date();
+
+        const differenceInHours =
+            (
+                appointmentDateTime - now
+            )
+            /
+            (
+                1000 * 60 * 60
+            );
+
+        if (appointmentDateTime <= now) {
+            return res.status(400).json({
+                message: "Past appointments cannot be cancelled."
+            });
+        }
+
+        if (differenceInHours < 12) {
+            return res.status(400).json({
+                message:
+                    "Appointments cannot be cancelled within 12 hours of the scheduled start time."
+            });
+        }
+
+        if (!cancellationReason) {
+            return res.status(400).json({
+                message:
+                    "Cancellation reason is required."
+            });
+        }
+
+        if (
+            cancellationReason.trim().length < 10
+        ) {
+            return res.status(400).json({
+                message:
+                    "Cancellation reason must be at least 10 characters."
+            });
+        }
+
+        if (
+            cancellationReason.length > 500
+        ) {
+            return res.status(400).json({
+                message:
+                    "Cancellation reason cannot exceed 500 characters."
+            });
+        }
+
+
+        if (
             appointment.clientId.toString()
             !==
             req.user._id.toString()
@@ -371,7 +529,14 @@ async function cancelAppointment(req, res) {
             });
         }
 
-        appointment.status = "cancelled";
+        appointment.status =
+            "cancelled";
+
+        appointment.cancellationReason =
+            cancellationReason;
+
+        appointment.cancelledAt =
+            new Date();
 
         await appointment.save();
 

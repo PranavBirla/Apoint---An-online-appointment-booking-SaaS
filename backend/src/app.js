@@ -5,6 +5,7 @@ const authRoutes = require("./routes/auth.routes")
 const professionalProfileRoutes = require("./routes/professionalProfile.routes")
 const availabilityRoutes = require("./routes/availability.routes")
 const appointmentRoutes = require("./routes/appointment.routes")
+const blockedSlotRoutes = require("./routes/blockedSlot.routes");
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api", professionalProfileRoutes);
 app.use("/api", availabilityRoutes);
 app.use("/api", appointmentRoutes);
+app.use("/api", blockedSlotRoutes);
 
 
 app.get("/", (req, res) => {

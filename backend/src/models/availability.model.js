@@ -12,7 +12,7 @@ const availabilitySchema = new mongoose.Schema({
         enum: [
             "Monday",
             "Tuesday",
-            "Wesnesday",
+            "Wednesday",
             "Thursday",
             "Friday",
             "Saturday",

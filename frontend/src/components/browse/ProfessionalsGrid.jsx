@@ -7,16 +7,21 @@ export default function ProfessionalsGrid({
 
     return (
         <section>
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-3xl font-bold">
+            <div
+                className="
+        grid
+        grid-cols-1
+        gap-0
+
+        md:grid-cols-2
+        md:gap-6
+
+        xl:grid-cols-3
+    "
+            >
+                <h2 className="md:text-3xl text-2xl font-bold">
                     {professionals.length} Professionals Available
                 </h2>
-
-                <select className="h-11 px-4 rounded-xl border border-gray-200">
-                    <option>Popularity</option>
-                    <option>Experience</option>
-                    <option>Fee</option>
-                </select>
             </div>
 
             <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">

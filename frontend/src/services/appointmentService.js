@@ -42,3 +42,32 @@ export async function createAppointment(
 
     return data;
 }
+
+export async function getMyAppointments(
+    status = ""
+) {
+    const { data } = await api.get(
+        "/appointments/my",
+        {
+            params: status
+                ? { status }
+                : {},
+        }
+    );
+
+    return data.appointments;
+}
+
+export async function cancelAppointment(
+    appointmentId,
+    cancellationReason
+) {
+    const { data } = await api.patch(
+        `/appointments/${appointmentId}/cancel`,
+        {
+            cancellationReason,
+        }
+    );
+
+    return data;
+}

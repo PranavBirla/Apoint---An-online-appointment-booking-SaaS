@@ -13,6 +13,19 @@ body{
   }
 
   body {
-    @apply m-0 bg-white text-black;
+    @apply m-0 bg-slate-50 text-slate-950;
+  }
+}
+
+@layer utilities {
+  .apoint-surface {
+    background:
+      radial-gradient(circle at top left, rgba(20, 184, 166, 0.16), transparent 28rem),
+      radial-gradient(circle at 82% 12%, rgba(59, 130, 246, 0.12), transparent 24rem),
+      linear-gradient(135deg, #ffffff 0%, #f8fafc 46%, #eef6f4 100%);
+  }
+
+  .apoint-panel {
+    @apply border border-slate-200 bg-white/85 shadow-[0_20px_70px_rgba(15,23,42,0.08)] backdrop-blur;
   }
 }

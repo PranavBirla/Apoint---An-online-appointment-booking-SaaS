@@ -1,9 +1,12 @@
-import { Eye } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Input({
     label,
     icon: Icon,
     type = "text",
+    rightElement,
+    showPassword,
+    onTogglePassword,
     ...props
 }) {
     return (
@@ -15,6 +18,7 @@ export default function Input({
             )}
 
             <div className="relative">
+
                 {Icon && (
                     <Icon
                         size={18}
@@ -23,34 +27,30 @@ export default function Input({
                 )}
 
                 <input
-                    type={type}
-                    className="
-          w-full
-          h-12
-          rounded-xl
-          border border-gray-300
-          pl-11
-          pr-4
-          outline-none
-          focus:border-black
-          transition-all
-        "
+                    type={
+                        type === "password" && showPassword
+                            ? "text"
+                            : type
+                    }
+                    className=" w-full h-12 rounded-xl border border-gray-300 pl-11 pr-12 outline-none focus:border-black transition-all "
                     {...props}
                 />
 
                 {type === "password" && (
-                    <Eye
-                        size={18}
-                        className="
-              absolute
-              right-4
-              top-1/2
-              -translate-y-1/2
-              text-gray-400
-              cursor-pointer
-            "
-                    />
+                    <button
+                        type="button"
+                        onClick={onTogglePassword}
+                        className=" absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition "
+                    >
+                        {showPassword ? (
+                            <EyeOff size={18} />
+                        ) : (
+                            <Eye size={18} />
+                        )}
+                    </button>
                 )}
+
+                {rightElement}
             </div>
         </div>
     );

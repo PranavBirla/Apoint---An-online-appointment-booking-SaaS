@@ -20,16 +20,10 @@ export default function ProfessionalHeader({
             <div className="flex flex-col md:flex-row md:items-center gap-8">
                 <img
                     src={
-                        professional?.userId?.avatar ||
-                        "https://i.pravatar.cc/300"
+                        professional.profileImage
                     }
                     alt=""
-                    className="
-              w-28
-              h-28
-              rounded-full
-              object-cover
-            "
+                    className="w-28 h-28 rounded-full object-cover"
                 />
 
                 <div className="flex-1">

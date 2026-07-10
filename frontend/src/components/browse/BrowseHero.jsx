@@ -1,28 +1,22 @@
 export default function BrowseHero() {
     return (
         <section className="mb-8">
-            <div className="grid lg:grid-cols-2 gap-8 items-center">
-                <div>
-                    <h1 className="text-6xl font-bold leading-[1.05] tracking-tight">
-                        Find the right
-                        <br />
-                        professional
-                    </h1>
+            <div className="bg-[url('https://img.magnific.com/free-vector/gradient-blur-pink-blue-abstract-background_53876-117324.jpg?semt=ais_hybrid&w=740&q=80')]">
+                <div className="grid lg:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <div className="flex gap-2 items-center">
+                            <img className="h-24" src="APOINT_LOGO.png" alt="" />
 
-                    <p className="mt-5 text-xl text-gray-500 max-w-lg">
-                        Browse verified professionals and
-                        book appointments in minutes.
-                    </p>
-                </div>
+                            <h1 className="md:text-6xl text-5xl font-bold leading-[1.05] tracking-tight">Apoint
+                            </h1>
+                        </div>
 
-                <div className="hidden lg:block">
-                    <div className="overflow-hidden rounded-3xl">
-                        <img
-                            src="https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=1600&auto=format&fit=crop"
-                            alt=""
-                            className="w-full h-[260px] object-cover"
-                        />
+                        <p className="mt-5 md:text-xl text-sm text-gray-500 max-w-md">
+                            Browse verified professionals and
+                            book appointments in minutes.
+                        </p>
                     </div>
+
                 </div>
             </div>
         </section>

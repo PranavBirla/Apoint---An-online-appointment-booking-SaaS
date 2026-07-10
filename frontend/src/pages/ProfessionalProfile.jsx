@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-
-import Sidebar from "../components/layout/Sidebar";
+import ProfessionalSidebar from "../components/layout/ProfessionalSidebar";
+import Sidebar from "../components/layout/Sidebar"
 
 import ProfessionalHeader from "../components/professional/ProfessionalHeader";
 import ProfessionalAbout from "../components/professional/ProfessionalAbout";
 import WeekCalendar from "../components/professional/WeekCalendar";
 import TimeSlots from "../components/professional/TimeSlots";
 import BookingPanel from "../components/professional/BookingPanel";
+
+import BookingRestrictionModal from "../modals/BookingRestrictionModal";
 
 import {
     getProfessional,
@@ -16,8 +18,13 @@ import {
     createAppointment,
 } from "../services/appointmentService";
 
+import { formatLocalDate } from "../utils/date";
+
 export default function ProfessionalProfile() {
     const { id } = useParams();
+
+    const [restrictionModal, setRestrictionModal] =
+        useState(null);
 
     const [professional, setProfessional] =
         useState(null);
@@ -38,6 +45,7 @@ export default function ProfessionalProfile() {
 
     const [bookingLoading, setBookingLoading] =
         useState(false);
+
 
     useEffect(() => {
         async function fetchProfile() {
@@ -67,9 +75,9 @@ export default function ProfessionalProfile() {
         async function fetchSlots() {
             try {
                 const formattedDate =
-                    selectedDate
-                        .toISOString()
-                        .split("T")[0];
+                    formatLocalDate(
+                        selectedDate
+                    );
 
                 const availableSlots =
                     await getAvailableSlots(
@@ -99,11 +107,16 @@ export default function ProfessionalProfile() {
         try {
             setBookingLoading(true);
 
+            const formattedDate =
+                formatLocalDate(
+                    selectedDate
+                );
+
             await createAppointment({
                 professionalId: id,
 
                 appointmentDate:
-                    selectedDate,
+                    formattedDate,
 
                 startTime:
                     selectedSlot.start,
@@ -116,11 +129,6 @@ export default function ProfessionalProfile() {
                 "Appointment booked successfully!"
             );
 
-            const formattedDate =
-                selectedDate
-                    .toISOString()
-                    .split("T")[0];
-
             const updatedSlots =
                 await getAvailableSlots(
                     id,
@@ -130,13 +138,38 @@ export default function ProfessionalProfile() {
             setSlots(updatedSlots);
 
             setSelectedSlot(null);
-        } catch (error) {
-            console.error(error);
 
-            alert(
-                error?.response?.data?.message ||
-                "Something went wrong"
-            );
+        } catch (error) {
+
+            const message =
+                error?.response?.data?.message;
+
+            if (
+                message.includes(
+                    "3 active appointments"
+                )
+            ) {
+                setRestrictionModal(
+                    "maxBookings"
+                );
+
+                return;
+            }
+
+            if (
+                message.includes(
+                    "active appointment with this professional"
+                )
+            ) {
+                setRestrictionModal(
+                    "existingAppointment"
+                );
+
+                return;
+            }
+
+            alert(message);
+
         } finally {
             setBookingLoading(false);
         }
@@ -145,7 +178,7 @@ export default function ProfessionalProfile() {
     if (loading) {
         return (
             <div className="flex bg-white min-h-screen">
-                <Sidebar />
+                <ProfessionalSidebar />
 
                 <main className="flex-1 p-8">
                     <div className="max-w-6xl mx-auto space-y-6">
@@ -232,6 +265,20 @@ export default function ProfessionalProfile() {
                         </div>
                     </div>
                 </div>
+
+                <BookingRestrictionModal
+                    isOpen={
+                        restrictionModal !== null
+                    }
+                    type={
+                        restrictionModal
+                    }
+                    onClose={() =>
+                        setRestrictionModal(
+                            null
+                        )
+                    }
+                />
             </main>
         </div>
     );
