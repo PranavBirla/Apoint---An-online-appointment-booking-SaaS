@@ -13,16 +13,13 @@ export default function ProfessionalHeader({
 
     const navigate = useNavigate();
 
-
     const name =
         professional?.userId?.username ||
         "Professional";
 
-
     const profession =
         professional?.profession ||
         "Professional";
-
 
     const specialization =
         professional?.specialization ||
@@ -33,20 +30,17 @@ export default function ProfessionalHeader({
         <section className="relative overflow-hidden bg-[#C7F36B] rounded-b-[26px] sm:rounded-[26px] lg:rounded-[30px]">
 
 
-            {/* DECORATIVE RINGS */}
+            {/* DECORATIVE ELEMENTS */}
 
             <div className="absolute -top-24 -right-24 w-64 h-64 lg:w-80 lg:h-80 rounded-full border-[46px] lg:border-[60px] border-black/[0.04] pointer-events-none"></div>
 
             <div className="hidden lg:block absolute -bottom-32 right-[28%] w-64 h-64 rounded-full border-[48px] border-black/[0.035] pointer-events-none"></div>
 
 
-
             <div className="relative z-10 px-4 pt-4 pb-5 sm:p-6 lg:p-9">
 
 
-                {/* ========================================= */}
                 {/* MOBILE TOP BAR */}
-                {/* ========================================= */}
 
                 <div className="flex items-center gap-3 lg:hidden">
 
@@ -68,9 +62,7 @@ export default function ProfessionalHeader({
 
 
 
-                {/* ========================================= */}
-                {/* DESKTOP BACK BUTTON */}
-                {/* ========================================= */}
+                {/* DESKTOP BACK */}
 
                 <button
                     type="button"
@@ -83,26 +75,18 @@ export default function ProfessionalHeader({
 
 
 
-                {/* ========================================= */}
-                {/* PROFESSIONAL IDENTITY */}
-                {/* ========================================= */}
+                {/* IDENTITY */}
 
                 <div className="mt-5 flex items-center gap-3 lg:items-end lg:justify-between lg:gap-6">
 
 
                     <div className="flex items-center gap-3 lg:gap-4 min-w-0">
 
-
-                        {/* AVATAR */}
-
                         <ProfessionalAvatar
                             professional={professional}
                             name={name}
                         />
 
-
-
-                        {/* NAME + PROFESSION */}
 
                         <div className="min-w-0">
 
@@ -149,9 +133,7 @@ export default function ProfessionalHeader({
 
 
 
-                {/* ========================================= */}
                 {/* MOBILE STATS */}
-                {/* ========================================= */}
 
                 <div className="mt-4 grid grid-cols-2 gap-2 lg:hidden">
 
@@ -176,10 +158,6 @@ export default function ProfessionalHeader({
 
 
 
-/* ========================================================= */
-/* PROFESSIONAL AVATAR */
-/* ========================================================= */
-
 function ProfessionalAvatar({
     professional,
     name,
@@ -197,7 +175,7 @@ function ProfessionalAvatar({
                 />
 
 
-                <span className="absolute -bottom-1 -right-1 w-4 h-4 lg:w-5 lg:h-5 rounded-full bg-[#C7F36B] border-[3px] border-black"></span>
+                <span className="absolute -bottom-1 -right-1 w-4 h-4 lg:w-5 lg:h-5 rounded-full bg-black border-[3px] border-[#C7F36B]"></span>
 
             </div>
         );
@@ -213,17 +191,13 @@ function ProfessionalAvatar({
             </div>
 
 
-            <span className="absolute -bottom-1 -right-1 w-4 h-4 lg:w-5 lg:h-5 rounded-full bg-[#C7F36B] border-[3px] border-black"></span>
+            <span className="absolute -bottom-1 -right-1 w-4 h-4 lg:w-5 lg:h-5 rounded-full bg-black border-[3px] border-[#C7F36B]"></span>
 
         </div>
     );
 }
 
 
-
-/* ========================================================= */
-/* MOBILE STAT */
-/* ========================================================= */
 
 function MobileStat({
     value,
@@ -237,7 +211,6 @@ function MobileStat({
                 {value}
             </p>
 
-
             <p className="mt-0.5 text-[9px] font-semibold text-black/45">
                 {label}
             </p>
@@ -247,10 +220,6 @@ function MobileStat({
 }
 
 
-
-/* ========================================================= */
-/* DESKTOP STAT */
-/* ========================================================= */
 
 function HeaderStat({
     icon: Icon,
@@ -264,7 +233,6 @@ function HeaderStat({
             <div className="flex items-center gap-2">
 
                 <Icon size={14} />
-
 
                 <span className="text-sm font-bold truncate">
                     {value}

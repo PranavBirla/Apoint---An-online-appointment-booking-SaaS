@@ -1,13 +1,20 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import ProfessionalSidebar from "../components/layout/ProfessionalSidebar";
-import Sidebar from "../components/layout/Sidebar"
+import {
+    useEffect,
+    useState,
+} from "react";
+
+import {
+    useParams,
+} from "react-router-dom";
+
+import Sidebar from "../components/layout/Sidebar";
 
 import ProfessionalHeader from "../components/professional/ProfessionalHeader";
 import ProfessionalAbout from "../components/professional/ProfessionalAbout";
 import WeekCalendar from "../components/professional/WeekCalendar";
 import TimeSlots from "../components/professional/TimeSlots";
 import BookingPanel from "../components/professional/BookingPanel";
+
 import BookingConfirmationModal from "../modals/BookingConfirmationModal";
 import BookingRestrictionModal from "../modals/BookingRestrictionModal";
 
@@ -18,12 +25,18 @@ import {
     createAppointment,
 } from "../services/appointmentService";
 
-import { formatLocalDate } from "../utils/date";
+import {
+    formatLocalDate,
+} from "../utils/date";
+
 
 export default function ProfessionalProfile() {
+
     const { id } = useParams();
 
-    const [confirmationOpen, setConfirmationOpen] = useState(false);
+
+    const [confirmationOpen, setConfirmationOpen] =
+        useState(false);
 
     const [restrictionModal, setRestrictionModal] =
         useState(null);
@@ -37,7 +50,8 @@ export default function ProfessionalProfile() {
     const [selectedDate, setSelectedDate] =
         useState(null);
 
-    const [slots, setSlots] = useState([]);
+    const [slots, setSlots] =
+        useState([]);
 
     const [selectedSlot, setSelectedSlot] =
         useState(null);
@@ -49,37 +63,74 @@ export default function ProfessionalProfile() {
         useState(false);
 
 
+
+    /* ===================================================== */
+    /* LOAD PROFESSIONAL + AVAILABLE DAYS */
+    /* ===================================================== */
+
     useEffect(() => {
+
         async function fetchProfile() {
+
             try {
+
                 const profile =
                     await getProfessional(id);
 
                 setProfessional(profile);
 
+
                 const days =
                     await getAvailableDays(id);
 
                 setAvailableDays(days);
+
             } catch (error) {
-                console.error(error);
+
+                console.error(
+                    "Unable to load professional:",
+                    error
+                );
+
             } finally {
+
                 setLoading(false);
+
             }
+
         }
 
+
         fetchProfile();
+
     }, [id]);
 
+
+
+    /* ===================================================== */
+    /* LOAD SLOTS WHEN DATE CHANGES */
+    /* ===================================================== */
+
     useEffect(() => {
-        if (!selectedDate) return;
+
+        if (!selectedDate) {
+
+            setSlots([]);
+            setSelectedSlot(null);
+
+            return;
+        }
+
 
         async function fetchSlots() {
+
             try {
+
                 const formattedDate =
                     formatLocalDate(
                         selectedDate
                     );
+
 
                 const availableSlots =
                     await getAvailableSlots(
@@ -87,34 +138,66 @@ export default function ProfessionalProfile() {
                         formattedDate
                     );
 
-                setSlots(availableSlots);
+
+                setSlots(
+                    Array.isArray(availableSlots)
+                        ? availableSlots
+                        : []
+                );
+
 
                 setSelectedSlot(null);
+
             } catch (error) {
-                console.error(error);
+
+                console.error(
+                    "Unable to load slots:",
+                    error
+                );
+
+
+                setSlots([]);
+                setSelectedSlot(null);
+
             }
+
         }
 
+
         fetchSlots();
+
     }, [selectedDate, id]);
 
+
+
+    /* ===================================================== */
+    /* BOOK APPOINTMENT */
+    /* ===================================================== */
+
     async function handleBooking() {
+
         if (
             !selectedDate ||
-            !selectedSlot
+            !selectedSlot ||
+            bookingLoading
         ) {
             return;
         }
 
+
         try {
+
             setBookingLoading(true);
+
 
             const formattedDate =
                 formatLocalDate(
                     selectedDate
                 );
 
+
             await createAppointment({
+
                 professionalId: id,
 
                 appointmentDate:
@@ -125,9 +208,12 @@ export default function ProfessionalProfile() {
 
                 endTime:
                     selectedSlot.end,
+
             });
 
+
             setConfirmationOpen(false);
+
 
             const updatedSlots =
                 await getAvailableSlots(
@@ -135,20 +221,33 @@ export default function ProfessionalProfile() {
                     formattedDate
                 );
 
-            setSlots(updatedSlots);
+
+            setSlots(
+                Array.isArray(updatedSlots)
+                    ? updatedSlots
+                    : []
+            );
+
 
             setSelectedSlot(null);
+
 
         } catch (error) {
 
             const message =
-                error?.response?.data?.message;
+                error?.response?.data?.message ||
+                "Unable to book appointment. Please try again.";
+
+
+            setConfirmationOpen(false);
+
 
             if (
                 message.includes(
                     "3 active appointments"
                 )
             ) {
+
                 setRestrictionModal(
                     "maxBookings"
                 );
@@ -156,11 +255,13 @@ export default function ProfessionalProfile() {
                 return;
             }
 
+
             if (
                 message.includes(
                     "active appointment with this professional"
                 )
             ) {
+
                 setRestrictionModal(
                     "existingAppointment"
                 );
@@ -168,50 +269,111 @@ export default function ProfessionalProfile() {
                 return;
             }
 
+
             alert(message);
 
+
         } finally {
+
             setBookingLoading(false);
+
         }
+
     }
 
+
+
+    /* ===================================================== */
+    /* LOADING STATE */
+    /* ===================================================== */
+
     if (loading) {
+
         return (
-            <div className="flex bg-white min-h-screen">
-                <ProfessionalSidebar />
 
-                <main className="flex-1 p-8">
-                    <div className="max-w-6xl mx-auto space-y-6">
-                        <div className="h-64 rounded-[28px] bg-gray-100 animate-pulse" />
+            <div className="flex min-h-screen bg-[#FAFAF7]">
 
-                        <div className="h-52 rounded-[28px] bg-gray-100 animate-pulse" />
+                <Sidebar />
 
-                        <div className="h-44 rounded-[28px] bg-gray-100 animate-pulse" />
+
+                <main className="flex-1 min-w-0 px-4 pb-32 sm:px-6 lg:px-8 lg:py-8">
+
+                    <div className="w-full max-w-[1400px] mx-auto">
+
+
+                        {/* HEADER SKELETON */}
+
+                        <div className="-mx-4 sm:mx-0">
+
+                            <div className="h-[220px] sm:h-[250px] lg:h-[300px] bg-[#E9E9E4] rounded-b-[26px] sm:rounded-[26px] lg:rounded-[30px] animate-pulse"></div>
+
+                        </div>
+
+
+
+                        <div className="mt-6 lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-7">
+
+                            <div className="space-y-7 lg:space-y-5">
+
+                                <div className="h-24 rounded-[18px] bg-[#EFEFEB] animate-pulse"></div>
+
+                                <div className="h-28 rounded-[18px] bg-[#EFEFEB] animate-pulse"></div>
+
+                                <div className="h-64 rounded-[18px] bg-[#EFEFEB] animate-pulse"></div>
+
+                            </div>
+
+
+                            <div className="hidden lg:block h-[350px] rounded-[26px] bg-[#E5E5E0] animate-pulse"></div>
+
+                        </div>
+
                     </div>
+
                 </main>
+
             </div>
         );
     }
 
+
+
+    /* ===================================================== */
+    /* PAGE */
+    /* ===================================================== */
+
     return (
+
         <div className="flex min-h-screen bg-[#FAFAF7]">
 
             <Sidebar />
 
 
-            <main className="flex-1 min-w-0 px-4 pt-5 pb-28 sm:px-6 lg:px-8 lg:py-8">
+            <main className="flex-1 min-w-0 px-4 pt-0 pb-44 sm:px-6 sm:pt-5 lg:px-8 lg:py-8">
 
                 <div className="w-full max-w-[1400px] mx-auto">
 
-                    <ProfessionalHeader
-                        professional={professional}
-                    />
+
+                    {/* HEADER */}
+
+                    <div className="-mx-4 sm:mx-0">
+
+                        <ProfessionalHeader
+                            professional={professional}
+                        />
+
+                    </div>
 
 
-                    <div className="mt-5 lg:mt-7 grid lg:grid-cols-[minmax(0,1fr)_360px] gap-5 lg:gap-7 items-start">
+
+                    {/* MAIN BOOKING AREA */}
+
+                    <div className="mt-5 lg:mt-7 lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-7 lg:items-start">
 
 
-                        <div className="space-y-5">
+                        {/* LEFT CONTENT */}
+
+                        <div className="space-y-7 lg:space-y-5">
 
                             <ProfessionalAbout
                                 professional={professional}
@@ -235,6 +397,9 @@ export default function ProfessionalProfile() {
                         </div>
 
 
+
+                        {/* DESKTOP SUMMARY + MOBILE FIXED BAR */}
+
                         <BookingPanel
                             professional={professional}
                             selectedDate={selectedDate}
@@ -251,6 +416,9 @@ export default function ProfessionalProfile() {
             </main>
 
 
+
+            {/* CONFIRMATION */}
+
             <BookingConfirmationModal
                 open={confirmationOpen}
                 professional={professional}
@@ -264,8 +432,13 @@ export default function ProfessionalProfile() {
             />
 
 
+
+            {/* RESTRICTION */}
+
             <BookingRestrictionModal
-                isOpen={restrictionModal !== null}
+                isOpen={
+                    restrictionModal !== null
+                }
                 type={restrictionModal}
                 onClose={() =>
                     setRestrictionModal(null)
