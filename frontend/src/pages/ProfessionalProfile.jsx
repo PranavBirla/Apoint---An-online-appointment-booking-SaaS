@@ -8,7 +8,7 @@ import ProfessionalAbout from "../components/professional/ProfessionalAbout";
 import WeekCalendar from "../components/professional/WeekCalendar";
 import TimeSlots from "../components/professional/TimeSlots";
 import BookingPanel from "../components/professional/BookingPanel";
-
+import BookingConfirmationModal from "../modals/BookingConfirmationModal";
 import BookingRestrictionModal from "../modals/BookingRestrictionModal";
 
 import {
@@ -22,6 +22,8 @@ import { formatLocalDate } from "../utils/date";
 
 export default function ProfessionalProfile() {
     const { id } = useParams();
+
+    const [confirmationOpen, setConfirmationOpen] = useState(false);
 
     const [restrictionModal, setRestrictionModal] =
         useState(null);
@@ -125,9 +127,7 @@ export default function ProfessionalProfile() {
                     selectedSlot.end,
             });
 
-            alert(
-                "Appointment booked successfully!"
-            );
+            setConfirmationOpen(false);
 
             const updatedSlots =
                 await getAvailableSlots(
@@ -194,92 +194,84 @@ export default function ProfessionalProfile() {
     }
 
     return (
-        <div className="flex bg-white min-h-screen">
+        <div className="flex min-h-screen bg-[#FAFAF7]">
+
             <Sidebar />
 
-            <main className="flex-1 p-6 lg:p-10">
-                <div className="max-w-6xl mx-auto">
-                    {/* HEADER */}
+
+            <main className="flex-1 min-w-0 px-4 pt-5 pb-28 sm:px-6 lg:px-8 lg:py-8">
+
+                <div className="w-full max-w-[1400px] mx-auto">
 
                     <ProfessionalHeader
                         professional={professional}
                     />
 
-                    {/* ABOUT */}
 
-                    <div className="mt-6">
-                        <ProfessionalAbout
-                            professional={professional}
-                        />
-                    </div>
+                    <div className="mt-5 lg:mt-7 grid lg:grid-cols-[minmax(0,1fr)_360px] gap-5 lg:gap-7 items-start">
 
-                    {/* CALENDAR */}
 
-                    <div className="mt-6">
-                        <WeekCalendar
-                            availableDays={availableDays}
-                            selectedDate={selectedDate}
-                            setSelectedDate={
-                                setSelectedDate
-                            }
-                        />
-                    </div>
+                        <div className="space-y-5">
 
-                    {/* SLOT + BOOKING */}
+                            <ProfessionalAbout
+                                professional={professional}
+                            />
 
-                    <div className="grid lg:grid-cols-3 gap-6 mt-6">
-                        {/* LEFT */}
 
-                        <div className="lg:col-span-2">
+                            <WeekCalendar
+                                availableDays={availableDays}
+                                selectedDate={selectedDate}
+                                setSelectedDate={setSelectedDate}
+                            />
+
+
                             <TimeSlots
                                 slots={slots}
-                                selectedSlot={
-                                    selectedSlot
-                                }
-                                setSelectedSlot={
-                                    setSelectedSlot
-                                }
+                                selectedDate={selectedDate}
+                                selectedSlot={selectedSlot}
+                                setSelectedSlot={setSelectedSlot}
                             />
+
                         </div>
 
-                        {/* RIGHT */}
 
-                        <div>
-                            <BookingPanel
-                                professional={
-                                    professional
-                                }
-                                selectedDate={
-                                    selectedDate
-                                }
-                                selectedSlot={
-                                    selectedSlot
-                                }
-                                handleBooking={
-                                    handleBooking
-                                }
-                                loading={
-                                    bookingLoading
-                                }
-                            />
-                        </div>
+                        <BookingPanel
+                            professional={professional}
+                            selectedDate={selectedDate}
+                            selectedSlot={selectedSlot}
+                            onContinue={() =>
+                                setConfirmationOpen(true)
+                            }
+                        />
+
                     </div>
+
                 </div>
 
-                <BookingRestrictionModal
-                    isOpen={
-                        restrictionModal !== null
-                    }
-                    type={
-                        restrictionModal
-                    }
-                    onClose={() =>
-                        setRestrictionModal(
-                            null
-                        )
-                    }
-                />
             </main>
+
+
+            <BookingConfirmationModal
+                open={confirmationOpen}
+                professional={professional}
+                selectedDate={selectedDate}
+                selectedSlot={selectedSlot}
+                loading={bookingLoading}
+                onClose={() =>
+                    setConfirmationOpen(false)
+                }
+                onConfirm={handleBooking}
+            />
+
+
+            <BookingRestrictionModal
+                isOpen={restrictionModal !== null}
+                type={restrictionModal}
+                onClose={() =>
+                    setRestrictionModal(null)
+                }
+            />
+
         </div>
     );
 }

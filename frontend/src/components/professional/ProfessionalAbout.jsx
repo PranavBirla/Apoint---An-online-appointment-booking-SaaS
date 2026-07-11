@@ -1,67 +1,60 @@
-import {
-    BriefcaseBusiness,
-    IndianRupee,
-    UserRound,
-} from "lucide-react";
-
 export default function ProfessionalAbout({
     professional,
 }) {
-    return (
-        <div
-            className="
-          bg-white
-          border
-          border-gray-200
-          rounded-[28px]
-          p-8
-        "
-        >
-            <h2 className="text-2xl font-semibold">
-                About
-            </h2>
 
-            <p className="mt-4 text-gray-600 leading-relaxed">
-                {professional?.bio}
+    return (
+        <section
+            className="
+                px-1
+                py-1
+
+                lg:bg-white
+                lg:border
+                lg:border-black/[0.06]
+                lg:rounded-[26px]
+                lg:p-6
+            "
+        >
+
+            <div className="flex items-center gap-3">
+
+                <div
+                    className="
+                        hidden
+                        lg:flex
+                        w-10
+                        h-10
+                        rounded-[13px]
+                        bg-[#C7F36B]
+                        items-center
+                        justify-center
+                    "
+                >
+                    <UserRound size={17} />
+                </div>
+
+
+                <div>
+
+                    <p className="hidden lg:block text-[10px] font-bold uppercase tracking-[0.12em] text-gray-400">
+                        Profile
+                    </p>
+
+                    <h2 className="text-[17px] lg:text-lg font-bold tracking-[-0.025em]">
+                        About
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <p className="mt-2.5 lg:mt-4 text-[13px] lg:text-sm leading-[1.65] text-gray-500">
+                {professional?.bio ||
+                    "No professional bio available."
+                }
             </p>
 
-            <div className="grid md:grid-cols-3 gap-4 mt-8">
-                <div className="bg-[#fafafa] rounded-2xl p-5">
-                    <UserRound size={20} />
-
-                    <h3 className="font-medium mt-3">
-                        Specialization
-                    </h3>
-
-                    <p className="text-gray-500 mt-1">
-                        {professional?.specialization}
-                    </p>
-                </div>
-
-                <div className="bg-[#fafafa] rounded-2xl p-5">
-                    <BriefcaseBusiness size={20} />
-
-                    <h3 className="font-medium mt-3">
-                        Experience
-                    </h3>
-
-                    <p className="text-gray-500 mt-1">
-                        {professional?.experienceYears} Years
-                    </p>
-                </div>
-
-                <div className="bg-[#fafafa] rounded-2xl p-5">
-                    <IndianRupee size={20} />
-
-                    <h3 className="font-medium mt-3">
-                        Consultation Fee
-                    </h3>
-
-                    <p className="text-gray-500 mt-1">
-                        ₹{professional?.consultationFee}
-                    </p>
-                </div>
-            </div>
-        </div>
+        </section>
     );
 }
