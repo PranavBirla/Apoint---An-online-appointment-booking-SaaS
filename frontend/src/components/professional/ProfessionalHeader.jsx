@@ -13,34 +13,87 @@ export default function ProfessionalHeader({
 
     const navigate = useNavigate();
 
+
     const name =
         professional?.userId?.username ||
         "Professional";
 
 
+    const profession =
+        professional?.profession ||
+        "Professional";
+
+
+    const specialization =
+        professional?.specialization ||
+        "General practice";
+
+
     return (
-        <section className="relative overflow-hidden bg-[#C7F36B] rounded-[24px] lg:rounded-[30px]">
-
-            <div className="absolute -top-24 -right-20 w-72 h-72 rounded-full border-[54px] border-black/[0.04] pointer-events-none"></div>
-
-            <div className="absolute -bottom-28 right-[30%] w-60 h-60 rounded-full border-[44px] border-black/[0.035] pointer-events-none"></div>
+        <section className="relative overflow-hidden bg-[#C7F36B] rounded-b-[26px] sm:rounded-[26px] lg:rounded-[30px]">
 
 
-            <div className="relative z-10 p-4 sm:p-6 lg:p-9">
+            {/* DECORATIVE RINGS */}
+
+            <div className="absolute -top-24 -right-24 w-64 h-64 lg:w-80 lg:h-80 rounded-full border-[46px] lg:border-[60px] border-black/[0.04] pointer-events-none"></div>
+
+            <div className="hidden lg:block absolute -bottom-32 right-[28%] w-64 h-64 rounded-full border-[48px] border-black/[0.035] pointer-events-none"></div>
+
+
+
+            <div className="relative z-10 px-4 pt-4 pb-5 sm:p-6 lg:p-9">
+
+
+                {/* ========================================= */}
+                {/* MOBILE TOP BAR */}
+                {/* ========================================= */}
+
+                <div className="flex items-center gap-3 lg:hidden">
+
+                    <button
+                        type="button"
+                        onClick={() => navigate(-1)}
+                        aria-label="Go back"
+                        className="w-9 h-9 rounded-full bg-black/[0.08] flex items-center justify-center active:scale-95 transition-transform"
+                    >
+                        <ArrowLeft size={17} />
+                    </button>
+
+
+                    <p className="text-sm font-bold tracking-[-0.02em]">
+                        Professional profile
+                    </p>
+
+                </div>
+
+
+
+                {/* ========================================= */}
+                {/* DESKTOP BACK BUTTON */}
+                {/* ========================================= */}
 
                 <button
                     type="button"
                     onClick={() => navigate(-1)}
-                    className="w-10 h-10 rounded-[13px] bg-black/[0.08] flex items-center justify-center active:scale-95 transition-transform"
+                    aria-label="Go back"
+                    className="hidden lg:flex w-10 h-10 rounded-[13px] bg-black/[0.08] items-center justify-center hover:bg-black/[0.12] active:scale-95 transition-all"
                 >
                     <ArrowLeft size={18} />
                 </button>
 
 
-                <div className="mt-5 flex items-start gap-4 lg:items-end lg:justify-between">
+
+                {/* ========================================= */}
+                {/* PROFESSIONAL IDENTITY */}
+                {/* ========================================= */}
+
+                <div className="mt-5 flex items-center gap-3 lg:items-end lg:justify-between lg:gap-6">
 
 
-                    <div className="flex items-start gap-4 min-w-0">
+                    <div className="flex items-center gap-3 lg:gap-4 min-w-0">
+
+
+                        {/* AVATAR */}
 
                         <ProfessionalAvatar
                             professional={professional}
@@ -48,18 +101,23 @@ export default function ProfessionalHeader({
                         />
 
 
-                        <div className="min-w-0 pt-1">
 
-                            <p className="text-[10px] lg:text-xs font-bold uppercase tracking-[0.12em] text-black/45">
-                                {professional?.profession}
+                        {/* NAME + PROFESSION */}
+
+                        <div className="min-w-0">
+
+                            <p className="text-[9px] lg:text-xs font-bold uppercase tracking-[0.12em] text-black/45 truncate">
+                                {profession}
                             </p>
 
-                            <h1 className="mt-1 text-[25px] lg:text-5xl font-bold tracking-[-0.045em] truncate">
+
+                            <h1 className="mt-0.5 text-[22px] sm:text-[26px] lg:text-5xl font-bold tracking-[-0.045em] truncate">
                                 {name}
                             </h1>
 
-                            <p className="mt-1 text-sm lg:text-base font-medium text-black/55">
-                                {professional?.specialization}
+
+                            <p className="mt-0.5 text-xs sm:text-sm lg:text-base font-medium text-black/55 truncate">
+                                {specialization}
                             </p>
 
                         </div>
@@ -68,6 +126,8 @@ export default function ProfessionalHeader({
 
 
 
+                    {/* DESKTOP STATS */}
+
                     <div className="hidden lg:grid grid-cols-2 gap-2 w-[340px]">
 
                         <HeaderStat
@@ -75,6 +135,7 @@ export default function ProfessionalHeader({
                             value={`${professional?.experienceYears || 0} years`}
                             label="Experience"
                         />
+
 
                         <HeaderStat
                             icon={IndianRupee}
@@ -88,16 +149,19 @@ export default function ProfessionalHeader({
 
 
 
-                <div className="grid grid-cols-2 gap-2 mt-5 lg:hidden">
+                {/* ========================================= */}
+                {/* MOBILE STATS */}
+                {/* ========================================= */}
 
-                    <HeaderStat
-                        icon={BriefcaseBusiness}
-                        value={`${professional?.experienceYears || 0} yrs`}
+                <div className="mt-4 grid grid-cols-2 gap-2 lg:hidden">
+
+                    <MobileStat
+                        value={`${professional?.experienceYears || 0} years`}
                         label="Experience"
                     />
 
-                    <HeaderStat
-                        icon={IndianRupee}
+
+                    <MobileStat
                         value={`₹${professional?.consultationFee || 0}`}
                         label="Consultation"
                     />
@@ -112,6 +176,10 @@ export default function ProfessionalHeader({
 
 
 
+/* ========================================================= */
+/* PROFESSIONAL AVATAR */
+/* ========================================================= */
+
 function ProfessionalAvatar({
     professional,
     name,
@@ -120,24 +188,69 @@ function ProfessionalAvatar({
     if (professional?.profileImage) {
 
         return (
-            <img
-                src={professional.profileImage}
-                alt={name}
-                className="w-[72px] h-[82px] lg:w-[110px] lg:h-[120px] rounded-[18px] lg:rounded-[24px] object-cover bg-white/30 shrink-0"
-            />
+            <div className="relative shrink-0">
+
+                <img
+                    src={professional.profileImage}
+                    alt={name}
+                    className="w-[58px] h-[64px] sm:w-[68px] sm:h-[74px] lg:w-[110px] lg:h-[120px] rounded-[15px] sm:rounded-[17px] lg:rounded-[24px] object-cover bg-white/30"
+                />
+
+
+                <span className="absolute -bottom-1 -right-1 w-4 h-4 lg:w-5 lg:h-5 rounded-full bg-[#C7F36B] border-[3px] border-black"></span>
+
+            </div>
         );
 
     }
 
 
     return (
-        <div className="w-[72px] h-[82px] lg:w-[110px] lg:h-[120px] rounded-[18px] lg:rounded-[24px] bg-black text-[#C7F36B] flex items-center justify-center text-2xl lg:text-4xl font-bold shrink-0">
-            {name[0]?.toUpperCase()}
+        <div className="relative shrink-0">
+
+            <div className="w-[58px] h-[64px] sm:w-[68px] sm:h-[74px] lg:w-[110px] lg:h-[120px] rounded-[15px] sm:rounded-[17px] lg:rounded-[24px] bg-black text-[#C7F36B] flex items-center justify-center text-xl sm:text-2xl lg:text-4xl font-bold">
+                {name[0]?.toUpperCase()}
+            </div>
+
+
+            <span className="absolute -bottom-1 -right-1 w-4 h-4 lg:w-5 lg:h-5 rounded-full bg-[#C7F36B] border-[3px] border-black"></span>
+
         </div>
     );
 }
 
 
+
+/* ========================================================= */
+/* MOBILE STAT */
+/* ========================================================= */
+
+function MobileStat({
+    value,
+    label,
+}) {
+
+    return (
+        <div className="bg-black/[0.06] rounded-[13px] px-3 py-2.5">
+
+            <p className="text-xs font-bold truncate">
+                {value}
+            </p>
+
+
+            <p className="mt-0.5 text-[9px] font-semibold text-black/45">
+                {label}
+            </p>
+
+        </div>
+    );
+}
+
+
+
+/* ========================================================= */
+/* DESKTOP STAT */
+/* ========================================================= */
 
 function HeaderStat({
     icon: Icon,
@@ -152,11 +265,13 @@ function HeaderStat({
 
                 <Icon size={14} />
 
-                <span className="text-sm font-bold">
+
+                <span className="text-sm font-bold truncate">
                     {value}
                 </span>
 
             </div>
+
 
             <p className="mt-1 text-[10px] font-semibold text-black/45">
                 {label}
