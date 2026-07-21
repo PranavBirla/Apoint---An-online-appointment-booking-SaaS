@@ -4,6 +4,7 @@ const { sendEmail } = require("./email.service");
 const appointmentBookedTemplate = require("../templates/appointmentBooked.template");
 const appointmentConfirmedTemplate = require("../templates/appointmentConfirmed.template");
 const appointmentCancelledTemplate = require("../templates/appointmentCancelled.template");
+const appointmentCancelledByClientTemplate = require("../templates/appointmentCancelledByClient.template")
 
 const {
     formatAppointmentDate
@@ -126,9 +127,50 @@ const createAppointmentCancelledNotification = async ({
 
 }
 
+const createAppointmentCancelledByClientNotification = async ({
+    appointment,
+    professional,
+    client
+}) => {
+
+    await Notification.create({
+        userId: professional.userId._id,
+        title: "Appointment Cancelled",
+        message:
+            `${client.username} cancelled the appointment.`,
+        type: "appointment_cancelled",
+        relatedAppointment: appointment._id
+    });
+
+    const html =
+        appointmentCancelledByClientTemplate({
+            professionalName:
+                professional.userId.username,
+            clientName:
+                client.username,
+            date:
+                formatAppointmentDate(
+                    appointment.appointmentDate
+                ),
+            startTime:
+                appointment.startTime,
+            endTime:
+                appointment.endTime
+        });
+
+    await sendEmail({
+        to:
+            professional.userId.email,
+        subject:
+            "🔴 Appointment Cancelled",
+        html
+    });
+}
+
 
 module.exports = {
     createAppointmentNotification,
     createAppointmentConfirmedNotification,
-    createAppointmentCancelledNotification
+    createAppointmentCancelledNotification,
+    createAppointmentCancelledByClientNotification
 };

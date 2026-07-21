@@ -5,7 +5,8 @@ const availabilityModel = require("../models/availability.model");
 const {
     createAppointmentNotification,
     createAppointmentConfirmedNotification,
-    createAppointmentCancelledNotification
+    createAppointmentCancelledNotification,
+    createAppointmentCancelledByClientNotification
 } = require("../services/notification.service");
 
 async function createAppointment(req, res) {
@@ -486,7 +487,19 @@ async function cancelAppointment(req, res) {
         const { cancellationReason } = req.body;
 
         const appointment =
-            await appointmentModel.findById(id);
+            await appointmentModel.findById(id)
+                .populate("clientId")
+                .populate({
+                    path: "professionalId",
+                    populate: {
+                        path: "userId"
+                    }
+                });
+
+        const client = appointment.clientId;
+
+        const professional =
+            appointment.professionalId;
 
         if (!appointment) {
             return res.status(404).json({
@@ -592,7 +605,7 @@ async function cancelAppointment(req, res) {
 
 
         if (
-            appointment.clientId.toString()
+            appointment.clientId._id.toString()
             !==
             req.user._id.toString()
         ) {
@@ -611,6 +624,21 @@ async function cancelAppointment(req, res) {
             new Date();
 
         await appointment.save();
+
+
+        //Notification Creation
+        try {
+            await createAppointmentCancelledByClientNotification({
+                appointment,
+                professional,
+                client
+            });
+        } catch (error) {
+            console.error(
+                "Cancellation notification failed:",
+                error
+            );
+        }
 
         res.status(200).json({
             message:

@@ -10,6 +10,10 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+await transporter.verify();
+
+console.log("SMTP Connected");
+
 async function sendEmail({
     to,
     subject,
