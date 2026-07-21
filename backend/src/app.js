@@ -6,6 +6,7 @@ const professionalProfileRoutes = require("./routes/professionalProfile.routes")
 const availabilityRoutes = require("./routes/availability.routes")
 const appointmentRoutes = require("./routes/appointment.routes")
 const blockedSlotRoutes = require("./routes/blockedSlot.routes");
+const testEmail = require("./controllers/testEmail.controller");
 
 const app = express();
 
@@ -40,5 +41,7 @@ app.use("/api", blockedSlotRoutes);
 app.get("/", (req, res) => {
     res.send("Backend Running!")
 })
+
+app.get("/test-email", testEmail.sendTestEmail)
 
 module.exports = app;

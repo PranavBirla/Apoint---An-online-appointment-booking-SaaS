@@ -2,11 +2,13 @@ import {
     X,
     Check,
     CheckCheck,
+    XCircle,
 } from "lucide-react";
 
 
 export default function AppointmentStatusConfirmModal({
     open,
+    variant,
     title,
     description,
     confirmText,
@@ -16,14 +18,24 @@ export default function AppointmentStatusConfirmModal({
 
     if (!open) return null;
 
+    let Icon = Check;
+    let iconBg = "bg-[#C7F36B]";
 
-    const isComplete =
-        confirmText?.toLowerCase() === "complete";
+    switch (variant) {
 
+        case "reject":
+            Icon = XCircle;
+            iconBg = "bg-red-100";
+            break;
 
-    const Icon = isComplete
-        ? CheckCheck
-        : Check;
+        case "complete":
+            Icon = CheckCheck;
+            iconBg = "bg-[#C7F36B]";
+            break;
+
+        default:
+            Icon = Check;
+    }
 
 
     return (
@@ -47,7 +59,7 @@ export default function AppointmentStatusConfirmModal({
 
                     <div className="relative z-10 flex items-start justify-between gap-4">
 
-                        <div className="w-11 h-11 rounded-[14px] bg-[#C7F36B] flex items-center justify-center">
+                        <div className={`w-11 h-11 rounded-[14px] ${iconBg} flex items-center justify-center`}>
                             <Icon size={19} />
                         </div>
 

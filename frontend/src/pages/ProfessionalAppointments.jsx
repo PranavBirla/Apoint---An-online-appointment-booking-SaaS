@@ -76,6 +76,19 @@ export default function ProfessionalAppointments() {
 
     }
 
+    async function handleReject(appointment) {
+        try {
+            await updateAppointmentStatus(
+                appointment.appointmentId,
+                "rejected"
+            );
+            await loadAppointments();
+            setSelectedAppointment(null);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
 
     async function handleComplete(appointment) {
 
@@ -113,6 +126,7 @@ export default function ProfessionalAppointments() {
         "confirmed",
         "completed",
         "cancelled",
+        "rejected"
     ];
 
 
@@ -328,6 +342,19 @@ export default function ProfessionalAppointments() {
                             appointment,
                         });
                     }}
+
+                    onReject={(appointment) => {
+
+                        setSelectedAppointment(null);
+
+                        setConfirmModal({
+                            open: true,
+                            type: "reject",
+                            appointment,
+                        });
+
+                    }}
+
                     onComplete={(appointment) => {
                         setSelectedAppointment(null);
 
@@ -342,20 +369,27 @@ export default function ProfessionalAppointments() {
 
                 <AppointmentStatusConfirmModal
                     open={confirmModal.open}
+                    variant={confirmModal.type}
                     title={
                         confirmModal.type === "confirm"
                             ? "Confirm Appointment"
-                            : "Complete Appointment"
+                            : confirmModal.type === "reject"
+                                ? "Reject Appointment"
+                                : "Complete Appointment"
                     }
                     description={
                         confirmModal.type === "confirm"
-                            ? "Are you sure you want to confirm this appointment?"
-                            : "Are you sure you want to mark this appointment as completed?"
+                            ? "Are you sure you want to confirm this appointment? The client will be notified immediately."
+                            : confirmModal.type === "reject"
+                                ? "Are you sure you want to reject this appointment? The client will be notified and this booking will be cancelled."
+                                : "Are you sure you want to mark this appointment as completed?"
                     }
                     confirmText={
                         confirmModal.type === "confirm"
                             ? "Confirm"
-                            : "Complete"
+                            : confirmModal.type === "reject"
+                                ? "Reject"
+                                : "Complete"
                     }
                     onClose={() =>
                         setConfirmModal({
@@ -365,25 +399,34 @@ export default function ProfessionalAppointments() {
                         })
                     }
                     onConfirm={async () => {
-
                         try {
-
-                            if (confirmModal.type === "confirm") {
-                                await handleConfirm(confirmModal.appointment);
-                            } else {
-                                await handleComplete(confirmModal.appointment);
+                            switch (confirmModal.type) {
+                                case "confirm":
+                                    await handleConfirm(
+                                        confirmModal.appointment
+                                    );
+                                    break;
+                                case "reject":
+                                    await handleReject(
+                                        confirmModal.appointment
+                                    );
+                                    break;
+                                case "complete":
+                                    await handleComplete(
+                                        confirmModal.appointment
+                                    );
+                                    break;
+                                default:
+                                    break;
                             }
-
                             setConfirmModal({
                                 open: false,
                                 type: null,
                                 appointment: null,
                             });
-
                         } catch (error) {
                             console.log(error);
                         }
-
                     }}
                 />
 

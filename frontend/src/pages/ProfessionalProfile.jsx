@@ -4,8 +4,13 @@ import {
 } from "react";
 
 import {
-    useParams,
+    useParams, useNavigate
 } from "react-router-dom";
+
+import {
+    formatBookingDate,
+    formatTimeRange,
+} from "../utils/time";
 
 import Sidebar from "../components/layout/Sidebar";
 
@@ -17,6 +22,7 @@ import BookingPanel from "../components/professional/BookingPanel";
 
 import BookingConfirmationModal from "../modals/BookingConfirmationModal";
 import BookingRestrictionModal from "../modals/BookingRestrictionModal";
+import SuccessModal from "../components/common/SuccessModal";
 
 import {
     getProfessional,
@@ -34,6 +40,12 @@ export default function ProfessionalProfile() {
 
     const { id } = useParams();
 
+    const navigate = useNavigate();
+
+    const [successOpen, setSuccessOpen] = useState(false);
+
+    const [successData, setSuccessData] =
+        useState(null);
 
     const [confirmationOpen, setConfirmationOpen] =
         useState(false);
@@ -197,22 +209,38 @@ export default function ProfessionalProfile() {
 
 
             await createAppointment({
-
                 professionalId: id,
-
                 appointmentDate:
                     formattedDate,
-
                 startTime:
                     selectedSlot.start,
-
                 endTime:
                     selectedSlot.end,
-
             });
 
+            setSuccessData({
+                professional:
+                    professional?.userId?.username,
+
+                profession:
+                    professional?.profession,
+
+                date:
+                    formatBookingDate(selectedDate),
+
+                time:
+                    formatTimeRange(
+                        selectedSlot.start,
+                        selectedSlot.end
+                    ),
+
+                status:
+                    "Pending Confirmation",
+            });
 
             setConfirmationOpen(false);
+
+            setSuccessOpen(true);
 
 
             const updatedSlots =
@@ -443,6 +471,31 @@ export default function ProfessionalProfile() {
                 onClose={() =>
                     setRestrictionModal(null)
                 }
+            />
+
+            <SuccessModal
+                open={successOpen}
+                onClose={() => {
+                    setSuccessOpen(false);
+                    setSuccessData(null);
+                }}
+                title="Appointment Booked Successfully"
+                description="Your appointment request has been sent to the professional."
+                infoCard={successData}
+                primaryAction={{
+                    label: "View My Appointments",
+                    onClick: () => {
+                        setSuccessOpen(false);
+                        navigate("/appointments");
+                    },
+                }}
+                secondaryAction={{
+                    label: "Continue Browsing",
+                    onClick: () => {
+                        setSuccessOpen(false);
+                        navigate("/professionals");
+                    },
+                }}
             />
 
         </div>

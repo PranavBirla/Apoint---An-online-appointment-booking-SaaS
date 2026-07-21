@@ -13,6 +13,7 @@ export default function ProfessionalAppointmentModal({
     appointment,
     onClose,
     onConfirm,
+    onReject,
     onComplete,
 }) {
 
@@ -39,6 +40,12 @@ export default function ProfessionalAppointmentModal({
         },
 
         cancelled: {
+            dot: "bg-[#E97878]",
+            text: "text-[#A33D3D]",
+            bg: "bg-[#FCEAEA]",
+        },
+
+        rejected: {
             dot: "bg-[#E97878]",
             text: "text-[#A33D3D]",
             bg: "bg-[#FCEAEA]",
@@ -188,14 +195,27 @@ export default function ProfessionalAppointmentModal({
 
                     {appointment.status === "pending" && (
 
-                        <button
-                            type="button"
-                            onClick={() => onConfirm(appointment)}
-                            className="w-full mt-4 h-13 min-h-[52px] rounded-[15px] bg-black text-white flex items-center justify-center gap-2 text-sm font-semibold hover:bg-black/85 active:scale-[0.99] transition-all"
-                        >
-                            <Check size={18} />
-                            Confirm appointment
-                        </button>
+                        <div className="mt-4 grid grid-cols-2 gap-3">
+
+                            <button
+                                type="button"
+                                onClick={() => onReject(appointment)}
+                                className="h-[52px] rounded-[15px] border border-red-200 bg-red-50 text-red-600 flex items-center justify-center gap-2 text-sm font-semibold hover:bg-red-100 active:scale-[0.99] transition-all"
+                            >
+                                <X size={17} />
+                                Reject
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => onConfirm(appointment)}
+                                className="h-[52px] rounded-[15px] bg-black text-white flex items-center justify-center gap-2 text-sm font-semibold hover:bg-black/85 active:scale-[0.99] transition-all"
+                            >
+                                <Check size={17} />
+                                Confirm
+                            </button>
+
+                        </div>
 
                     )}
 

@@ -33,6 +33,12 @@ export default function ProfessionalAppointmentCard({
             text: "text-[#A33D3D]",
             label: "Cancelled",
         },
+
+        rejected: {
+            dot: "bg-[#E97878]",
+            text: "text-[#A33D3D]",
+            label: "Rejected",
+        },
     };
 
 

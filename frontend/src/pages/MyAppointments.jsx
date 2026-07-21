@@ -6,6 +6,7 @@ import {
 import Sidebar from "../components/layout/Sidebar";
 
 import AppointmentHero from "../components/appointments/AppointmentHero";
+import FeaturedAppointment from "../components/appointments/FeaturedAppointment";
 import AppointmentTabs from "../components/appointments/AppointmentTabs";
 import AppointmentList from "../components/appointments/AppointmentList";
 import AppointmentDetailsModal from "../components/appointments/AppointmentDetailsModal";
@@ -17,7 +18,7 @@ import { getProfessionals } from "../services/professionalService";
 import {
     getMyAppointments,
 } from "../services/appointmentService";
-import{
+import {
     cancelAppointment,
 } from "../services/appointmentService"
 
@@ -37,9 +38,24 @@ export default function MyAppointments() {
     const [loading, setLoading] =
         useState(true);
 
-    const [selectedAppointment,
-        setSelectedAppointment] =
-        useState(null);
+    const [selectedAppointment, setSelectedAppointment] = useState(null);
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
+
+    const handleViewAppointment = (appointment) => {
+        setSelectedAppointment(appointment);
+        setShowDetailsModal(true);
+    };
+
+    const nextAppointment = appointments
+        .filter(
+            (appointment) =>
+                appointment.status !== "cancelled" &&
+                new Date(appointment.date) >= new Date()
+        )
+        .sort(
+            (a, b) =>
+                new Date(a.date) - new Date(b.date)
+        )[0];
 
     async function loadAppointments() {
         try {
@@ -96,55 +112,92 @@ export default function MyAppointments() {
     }, [activeTab]);
 
     return (
-        <div className="flex bg-white min-h-screen">
+        <div className="min-h-screen bg-[#FAFAF7] flex overflow-hidden">
+
             <Sidebar />
 
-            <main className="flex-1 p-6 lg:p-10">
-                <div className="max-w-7xl mx-auto">
-                    <AppointmentHero />
+            <main
+                className="
+            relative
+            flex-1
+            min-w-0
+            overflow-x-hidden
+            px-4
+            sm:px-6
+            lg:px-10
+            pt-5
+            pb-28
+            lg:pb-10
+        "
+            >
+
+                {/* Decorative Rings */}
+
+                <div className="pointer-events-none absolute -top-52 -right-44 h-[520px] w-[520px] rounded-full border-[55px] border-black/[0.035]" />
+
+                <div className="pointer-events-none absolute bottom-[-180px] -left-44 h-[420px] w-[420px] rounded-full border-[45px] border-black/[0.03]" />
+
+                <div className="relative mx-auto max-w-6xl space-y-8 lg:space-y-10">
+
+                    <AppointmentHero
+                        upcomingCount={
+                            appointments.filter(
+                                (appointment) =>
+                                    appointment.status !== "cancelled" &&
+                                    new Date(appointment.date) >= new Date()
+                            ).length
+                        }
+                    />
+
+                    <FeaturedAppointment
+                        appointment={nextAppointment}
+                        onViewDetails={handleViewAppointment}
+                        onBrowseProfessionals={() => navigate("/professionals")}
+                    />
 
                     <AppointmentTabs
                         activeTab={activeTab}
-                        setActiveTab={
-                            setActiveTab
-                        }
+                        setActiveTab={setActiveTab}
                     />
 
                     <AppointmentList
                         appointments={appointments}
                         loading={loading}
-                        setSelectedAppointment={
-                            setSelectedAppointment
-                        }
+                        setSelectedAppointment={setSelectedAppointment}
                     />
 
-                    <RecommendedProfessionals
-                        professionals={recommended}
-                    />
+                    <section className="pt-4 border-t border-black/5">
 
-                    <AppointmentDetailsModal
-                        appointment={
-                            selectedAppointment
-                        }
-                        onClose={() =>
-                            setSelectedAppointment(null)
-                        }
-                        onCancelClick={() =>
-                            setShowCancelModal(true)
-                        }
-                    />
+                        <RecommendedProfessionals
+                            professionals={recommended}
+                        />
 
-                    <CancelAppointmentModal
-                        open={showCancelModal}
-                        onClose={() =>
-                            setShowCancelModal(false)
-                        }
-                        onConfirm={
-                            handleCancelAppointment
-                        }
-                    />
+                    </section>
+
                 </div>
+
+                <AppointmentDetailsModal
+                    appointment={selectedAppointment}
+                    onClose={() =>
+                        setSelectedAppointment(null)
+                    }
+                    onCancelClick={() =>
+                        setShowCancelModal(true)
+                    }
+                />
+
+                <CancelAppointmentModal
+                    open={showCancelModal}
+                    onClose={() =>
+                        setShowCancelModal(false)
+                    }
+                    onConfirm={handleCancelAppointment}
+                />
+
             </main>
+
         </div>
     );
 }
+
+

@@ -182,8 +182,6 @@ async function getMe(req, res) {
     })
 }
 
-
-
 module.exports = {
     registerUser,
     updateUserProfile,

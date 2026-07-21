@@ -2,6 +2,12 @@ const appointmentModel = require("../models/appointment.model");
 const professionalProfileModel = require("../models/professionalProfile.model");
 const availabilityModel = require("../models/availability.model");
 
+const {
+    createAppointmentNotification,
+    createAppointmentConfirmedNotification,
+    createAppointmentCancelledNotification
+} = require("../services/notification.service");
+
 async function createAppointment(req, res) {
 
     try {
@@ -9,7 +15,7 @@ async function createAppointment(req, res) {
         const { professionalId, appointmentDate, startTime, endTime } = req.body;
 
         const clientId = req.user._id
-
+        const client = req.user
 
 
         function parseLocalDate(dateString) {
@@ -69,7 +75,7 @@ async function createAppointment(req, res) {
         }
 
 
-        const professional = await professionalProfileModel.findById(professionalId);
+        const professional = await professionalProfileModel.findById(professionalId).populate("userId");
 
         if (!professional) {
             return res.status(404).json({
@@ -143,7 +149,7 @@ async function createAppointment(req, res) {
             });
         }
 
-        
+
 
         const appointment = await appointmentModel.create({
             clientId,
@@ -152,6 +158,21 @@ async function createAppointment(req, res) {
             startTime,
             endTime
         })
+
+
+        //Create Notification
+        try {
+            await createAppointmentNotification({
+                appointment,
+                professional,
+                client
+            });
+        } catch (error) {
+            console.error(
+                "Notification failed:",
+                error
+            );
+        }
 
         res.status(201).json({
             message: "Appointment booked successfully!",
@@ -331,7 +352,9 @@ async function updateAppointmentStatus(req, res) {
         const validStatuses = [
             "pending",
             "confirmed",
-            "completed"
+            "completed",
+            "cancelled",
+            "rejected"
         ];
 
         if (!validStatuses.includes(status)) {
@@ -346,7 +369,14 @@ async function updateAppointmentStatus(req, res) {
             });
 
         const appointment =
-            await appointmentModel.findById(id);
+            await appointmentModel.findById(id)
+                .populate("clientId")
+                .populate({
+                    path: "professionalId",
+                    populate: {
+                        path: "userId"
+                    }
+                });
 
         if (!appointment) {
             return res.status(404).json({
@@ -355,8 +385,7 @@ async function updateAppointmentStatus(req, res) {
         }
 
         if (
-            appointment.professionalId.toString()
-            !==
+            appointment.professionalId._id.toString() !==
             profile._id.toString()
         ) {
             return res.status(403).json({
@@ -374,10 +403,18 @@ async function updateAppointmentStatus(req, res) {
         }
 
         const allowedTransitions = {
-            pending: ["confirmed", "cancelled"],
-            confirmed: ["completed", "cancelled"],
+            pending: [
+                "confirmed",
+                "cancelled",
+                "rejected",
+            ],
+            confirmed: [
+                "completed",
+                "cancelled",
+            ],
+            rejected: [],
+            cancelled: [],
             completed: [],
-            cancelled: []
         };
 
         if (
@@ -394,6 +431,41 @@ async function updateAppointmentStatus(req, res) {
         appointment.status = status;
 
         await appointment.save();
+
+        //Notification Creation
+        if (status === "confirmed") {
+            try {
+                await createAppointmentConfirmedNotification({
+                    appointment,
+                    professional: appointment.professionalId,
+                    client: appointment.clientId
+                });
+            } catch (error) {
+                console.error(
+                    "Confirmation notification failed:",
+                    error
+                );
+            }
+        }
+
+        if (status === "cancelled" || "rejected") {
+            try {
+                await createAppointmentCancelledNotification({
+                    appointment,
+                    professional:
+                        appointment.professionalId,
+                    client:
+                        appointment.clientId
+                });
+            } catch (error) {
+                console.error(
+                    "Cancellation notification failed:",
+                    error
+                );
+            }
+        }
+
+
 
         res.status(200).json({
             message: "Status updated successfully",
