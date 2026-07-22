@@ -449,7 +449,7 @@ async function updateAppointmentStatus(req, res) {
             }
         }
 
-        if (status === "cancelled" || "rejected") {
+        if (status === "cancelled" || status === "rejected") {
             try {
                 await createAppointmentCancelledNotification({
                     appointment,

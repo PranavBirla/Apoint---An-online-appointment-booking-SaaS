@@ -35,7 +35,7 @@ const createAppointmentNotification = async ({
     });
 
     try {
-        await sendEmail({
+        sendEmail({
             to: professional.userId.email,
             subject: "📅 New Appointment Booked",
             html
@@ -76,11 +76,15 @@ const createAppointmentConfirmedNotification = async ({
             appointment.endTime
     });
 
-    await sendEmail({
+    sendEmail({
         to: client.email,
         subject:
             "✅ Your Appointment Has Been Confirmed",
         html
+    }).catch(error => {
+
+        console.error(error);
+    
     });
 }
 
@@ -117,12 +121,16 @@ const createAppointmentCancelledNotification = async ({
                 appointment.endTime
         });
 
-    await sendEmail({
+    sendEmail({
         to:
             client.email,
         subject:
             "Appointment Cancelled",
         html
+    }).catch(error => {
+
+        console.error(error);
+    
     });
 
 }
@@ -158,12 +166,16 @@ const createAppointmentCancelledByClientNotification = async ({
                 appointment.endTime
         });
 
-    await sendEmail({
+    sendEmail({
         to:
             professional.userId.email,
         subject:
             "🔴 Appointment Cancelled",
         html
+    }).catch(error => {
+
+        console.error(error);
+    
     });
 }
 
