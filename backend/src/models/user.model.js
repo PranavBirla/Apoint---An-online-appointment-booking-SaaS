@@ -24,10 +24,19 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
+
     isVerified: {
         type: Boolean,
         default: false
     },
+
+    emailVerificationToken: {
+        type: String
+    },
+
+    emailVerificationTokenExpires: {
+        type: Date
+    }
 },
     { timestamps: true }
 );

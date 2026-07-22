@@ -2,6 +2,7 @@ const userModel = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
+const crypto = require("crypto");
 
 dotenv.config();
 
@@ -9,6 +10,8 @@ async function registerUser(req, res) {
     try {
 
         const { username, email, password, role, avatar, isVerified } = req.body;
+
+        const { sendVerificationEmail } = require("../services/verification.service");
 
         const isUserAlreadyExist = await userModel.findOne({ email });
 
@@ -39,6 +42,8 @@ async function registerUser(req, res) {
             avatar,
             isVerified
         });
+
+        await sendVerificationEmail(user);
 
         const token = jwt.sign({
             id: user._id
@@ -182,10 +187,63 @@ async function getMe(req, res) {
     })
 }
 
+async function verifyEmail(req, res) {
+    try {
+        const { token } = req.body;
+
+        if (!token) {
+            res.status(400).json({
+                message: "Verification token is required."
+            })
+        }
+
+        const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+        const user = await userModel.findOne({
+            emailVerificationToken: hashedToken,
+            emailVerificationTokenExpires: {
+                $gt: new Date()
+            }
+        })
+
+        if (!user) {
+            return res.status(400).json({
+                message: "Invalid or expired verification link."
+            })
+        }
+
+        if (user.isVerified) {
+            return res.status(400).json({
+                message: "Email is already verified."
+            });
+        }
+
+        //verify the account
+        user.isVerified = true;
+
+        //remove token
+        user.emailVerificationToken = undefined;
+        user.emailVerificationTokenExpires = undefined;
+
+        await user.save();
+
+        return res.status(200).json({
+            message: "Email verified successfully."
+        })
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message:
+                "Something went wrong."
+        });
+    }
+}
+
 module.exports = {
     registerUser,
     updateUserProfile,
     loginUser,
     logoutUser,
-    getMe
+    getMe,
+    verifyEmail
 }

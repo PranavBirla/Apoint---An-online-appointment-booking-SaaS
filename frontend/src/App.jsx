@@ -17,6 +17,7 @@ import ProfessionalAppointments from './pages/ProfessionalAppointments'
 import ProfessionalAvailability from './pages/ProfessionalAvailability'
 import ProfessionalProfileManagement from './pages/ProfessionalProfileManagement'
 import CancelAppointment from './pages/CancelAppointment'
+import VerifyEmail from './pages/VerifyEmail'
 
 import ClientRoute from './routes/ClientRoute'
 import ProfessionalRoute from './routes/ProfessionalRoute'
@@ -30,7 +31,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/loader" element={<PageLoader />} />
-
+        <Route path="/verify-email/:token" element={<VerifyEmail />}/>
 
 
         <Route path="/professionals" element={
